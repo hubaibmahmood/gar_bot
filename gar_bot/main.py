@@ -6,17 +6,74 @@ from fastapi import FastAPI
 from typing import Dict
 from datetime import datetime
 import base64
-
+import requests
+import shutil
 
 app = FastAPI(
     title="Bot",
-    version="0.0.1"
+    version="0.0.2"
 )
+
+
+PROXY = "gw.dataimpulse.com:823"
+USERNAME = "cc72c1209265887c7f62"
+PASSWORD = "5a62f7c1961e3096"
+
+
+main_tab: uc.Tab
+
+
+
+async def auth_challenge_handler(event: uc.cdp.fetch.AuthRequired):
+    global main_tab
+    # Split the credentials
+    # Respond to the authentication challenge
+    asyncio.create_task(
+        main_tab.send(
+            uc.cdp.fetch.continue_with_auth(
+                request_id=event.request_id,
+                auth_challenge_response=uc.cdp.fetch.AuthChallengeResponse(
+                    response="ProvideCredentials",
+                    username=USERNAME,
+                    password=PASSWORD,
+                ),
+            )
+        )
+    )
+
+
+
+
+async def req_paused(event: uc.cdp.fetch.RequestPaused):
+    global main_tab
+    asyncio.create_task(
+        main_tab.send(
+            uc.cdp.fetch.continue_request(request_id=event.request_id)
+        )
+    )
+
+
+
+
+async def generator():
+    browser = await uc.start(
+        browser_args=[f"--proxy-server={PROXY}"],
+    )
+    main_tab = await browser.get("draft:,")
+    main_tab.add_handler(uc.cdp.fetch.RequestPaused, req_paused)
+    main_tab.add_handler(
+        uc.cdp.fetch.AuthRequired, auth_challenge_handler
+    )
+    await main_tab.send(uc.cdp.fetch.enable(handle_auth_requests=True))
+    # return await asyncio.gather(*browser, return_exceptions=True)
+
+    return browser
 
 
 
 
 async def main(data):
+    global main_tab
 
     transaction_successfull: bool = False
     transaction_date_ = ""
@@ -31,12 +88,14 @@ async def main(data):
 
 
     response_dict = {
-        "order_id": "74",
+        "order_id": data['order_id'],
         "order_status": "done",
         "vouchers": [],
         "invalid_ids": []
         
     }
+
+    response_endpoint: str = "https://gameheaven.net/wp-json/custom-order-plugin/v1/orders"
 
     
 
@@ -57,9 +116,34 @@ async def main(data):
         return response_dict
         
 
+    # with open(os.path.join(os.getcwd(),"trxids.txt"), "a") as f:
+    #     f.write(data['trxid']+"\n")
+
+    while True:
+
+        try:
+            browser = await uc.start(
+                browser_args=[f"--proxy-server={PROXY}"],
+            )
+            main_tab = await browser.get("draft:,")
+            main_tab.add_handler(uc.cdp.fetch.RequestPaused, req_paused)
+            main_tab.add_handler(
+                uc.cdp.fetch.AuthRequired, auth_challenge_handler
+            )
+            await main_tab.send(uc.cdp.fetch.enable(handle_auth_requests=True))
+
+            break
+            
+
+        except Exception as e:
+            print("Exception caught")
 
 
-    browser = await uc.start()
+
+
+    # page = await browser.get('https://whatismyipaddress.com/')
+    # input("wait")
+
 
     try:
         page = await browser.get('https://shop.garena.my/app/100067/idlogin')
@@ -80,6 +164,7 @@ async def main(data):
                     await player_id_input.clear_input()
                     await player_id_input.click()
                     await player_id_input.send_keys(str(order_item['player_id']))
+                    await page.sleep(1)
                 
             except Exception as e:
                 print("Player input not found\n\nTry again later !!!\n\n")
@@ -105,7 +190,6 @@ async def main(data):
                     # print("Server mismatch")
                     
                     response_dict['invalid_ids'].append(str(order_item['player_id']))
-
                     continue
 
             except Exception as e:
@@ -332,10 +416,10 @@ async def main(data):
                             }
 
                             response_dict["vouchers"].append(voucher_dict)
+
+                            shutil.move(filename, "outputImages/")
+                            
                             continue
-
-
-
 
 
                         try:
@@ -349,13 +433,6 @@ async def main(data):
                         except Exception as e:
                             print("Payment selection channel not found")
 
-
-
-                        # if item['voucher_data']['voucher_quantity'] > 1:
-                        #     voucher = item['voucher_data']['voucher_codes'][i]
-
-                        # else:
-                        #     voucher = item['voucher']
 
                         voucher = item['voucher_data'][i]['voucher_codes'][j]
 
@@ -388,7 +465,6 @@ async def main(data):
                                 print("Voucher platform not found!!!")
                         
 
-                        # if item['quantity'] > 1:
 
                         pin__ = item['voucher_data'][i]['voucher_codes'][j].split(" ")[1]
 
@@ -397,16 +473,6 @@ async def main(data):
                         item['voucher_data'][i]['voucher_codes'][j] = item['voucher_data'][i]['voucher_codes'][j].replace("-", "").replace("BDMB", "").replace("UPBD", "")
 
                         serial_ = item['voucher_data'][i]['voucher_codes'][j].split(" ")[0]
-
-                        # print(serial_)
-                        # else:
-                        #     pin__ = item['voucher'].split(" ")[1]
-
-                        #     pin_ = pin__.split("-")
-
-                        #     item['voucher'] = item['voucher'].replace("-", "").replace("BDMB", "").replace("UPBD", "")
-
-                        #     serial_ = item['voucher'].split(" ")[0]
 
 
 
@@ -515,6 +581,8 @@ async def main(data):
 
                                 response_dict["vouchers"].append(voucher_dict)
 
+                                shutil.move(filename, "outputImages/")
+
                         except Exception as e:
                             print("Transation failed !!!")
 
@@ -550,6 +618,7 @@ async def main(data):
 
                                     response_dict["vouchers"].append(voucher_dict)
 
+                                    shutil.move(filename, "outputImages/")
 
                             except Exception as e:
                                 pass
@@ -583,6 +652,9 @@ async def main(data):
                                     }
 
                                     response_dict["vouchers"].append(voucher_dict)
+
+                                    shutil.move(filename, "outputImages/")
+
 
 
                             except Exception as e:
@@ -618,6 +690,9 @@ async def main(data):
 
                                     response_dict["vouchers"].append(voucher_dict)
 
+                                    shutil.move(filename, "outputImages/")
+
+
 
                             except Exception as e:
                                 pass
@@ -638,11 +713,17 @@ async def main(data):
             await page.bring_to_front()
             
 
-        with open(os.path.join(os.getcwd(),"trxids.txt"), "a") as f:
-            f.write(data['trxid']+"\n")
+
 
 
         # await page.close()
+
+
+        endpoint_response = requests.post(response_endpoint, json={
+            "result": response_dict
+        })
+
+        # print(endpoint_response.text)
 
         return response_dict
     
@@ -656,7 +737,6 @@ async def main(data):
 @app.post("/order/")
 async def run(payload: Dict):
 
-    # uc.loop().run_until_complete(main(payload))
     result = await main(payload)
 
     return {"result": result}
@@ -722,7 +802,7 @@ if __name__ == '__main__':
 
     payload = {
   "domain": "https://gameheaven.net",
-  "order_id": "563",
+  "order_id": "56025",
   "order_items": [
     {
       "player_id": "3840381346",
@@ -741,13 +821,6 @@ if __name__ == '__main__':
                 "UPBD-Q-S-00188996 5296-7643-3163-3955"
               ]
             },
-            {
-              "voucher_value": "25 Diamond",
-              "voucher_quantity": 1,
-              "voucher_codes": [
-                "UPBD-Q-S-00186901 4551-7713-5524-2593"
-              ]
-            }
           ]
         }
       ],
@@ -787,7 +860,7 @@ if __name__ == '__main__':
     }
   ],
   "status": "processing",
-  "trxid": "Ubbuby"
+  "trxid": "test2"
 }
 
     # since asyncio.run never worked (for me)
