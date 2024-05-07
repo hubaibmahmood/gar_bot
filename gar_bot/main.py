@@ -741,9 +741,9 @@ async def main(data):
         # await page.close()
 
 
-        # endpoint_response = requests.post(response_endpoint, json={
-        #     "result": response_dict
-        # })
+        endpoint_response = requests.post(response_endpoint, json={
+            "result": response_dict
+        })
 
         # print(endpoint_response.text)
 
