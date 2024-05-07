@@ -8,16 +8,27 @@ from datetime import datetime
 import base64
 import requests
 import shutil
+from starlette.config import Config
+from starlette.datastructures import Secret
+import random
+
+
+config = Config("../.env")
 
 app = FastAPI(
     title="Bot",
     version="0.0.2"
 )
 
+PROXY = config("PROXY")
+USERNAME = config("USERNAME")
+PASSWORD = config('PASSWORD')
 
-PROXY = "gw.dataimpulse.com:823"
-USERNAME = "cc72c1209265887c7f62"
-PASSWORD = "5a62f7c1961e3096"
+
+
+# PROXY = "gw.dataimpulse.com:823"
+# USERNAME = "cc72c1209265887c7f62"
+# PASSWORD = "5a62f7c1961e3096"
 
 
 main_tab: uc.Tab
@@ -147,6 +158,7 @@ async def main(data):
 
     try:
         page = await browser.get('https://shop.garena.my/app/100067/idlogin')
+        await page.sleep(random.uniform(2, 5))
         
         for order_item in data['order_items']:
 
@@ -164,7 +176,8 @@ async def main(data):
                     await player_id_input.clear_input()
                     await player_id_input.click()
                     await player_id_input.send_keys(str(order_item['player_id']))
-                    await page.sleep(1)
+                    await page.sleep(random.uniform(2, 5))
+                    # time.sleep(2)
                 
             except Exception as e:
                 print("Player input not found\n\nTry again later !!!\n\n")
@@ -179,12 +192,13 @@ async def main(data):
 
             if login_btn:
                 await login_btn.click()
-                await page.sleep(1)
+                # await page.sleep(1)
+                # time.sleep(2)
 
 
             try:
 
-                server_mismatch_check = await page.find("Proceed to correct shop")
+                server_mismatch_check = await page.find("Proceed to correct shop", timeout=2)
 
                 if server_mismatch_check:
                     # print("Server mismatch")
@@ -229,11 +243,12 @@ async def main(data):
 
                         # print(i, j)
 
-                        proceed_to_payment_btn = await page.select('input[value="Proceed to Payment"]')
+                        proceed_to_payment_btn = await page.find('Proceed to Payment')
 
                         if proceed_to_payment_btn:
                             await proceed_to_payment_btn.click()
-                            time.sleep(1)
+                            await page.sleep(random.uniform(6, 8))
+                            # time.sleep(10)
 
 
 
@@ -348,10 +363,15 @@ async def main(data):
 
                                 print("weekly found!!")
 
+
                                 diamonds_div2 = await page.find("Weekly Membership")
+                                # await diamonds_div2.highlight_overlay()
+
 
                                 if diamonds_div2:
                                     await diamonds_div2.click()
+                                    # print("weekly clicked !!!")
+
                                     time.sleep(1)
                                 
                                 else:
@@ -423,12 +443,13 @@ async def main(data):
 
 
                         try:
-
+                            await page.sleep(random.uniform(2, 5))
                             payment_channel_selection = await page.find("Physical Vouchers")
 
                             if payment_channel_selection:
                                 await payment_channel_selection.click()
-                                time.sleep(1)
+                                await page.sleep(2)
+
 
                         except Exception as e:
                             print("Payment selection channel not found")
@@ -477,6 +498,7 @@ async def main(data):
 
 
                         try:
+                            await page.sleep(random.uniform(2, 5))
                             serial_input = await page.find("input[name=serial_1]")
 
                             if serial_input:
@@ -719,9 +741,9 @@ async def main(data):
         # await page.close()
 
 
-        endpoint_response = requests.post(response_endpoint, json={
-            "result": response_dict
-        })
+        # endpoint_response = requests.post(response_endpoint, json={
+        #     "result": response_dict
+        # })
 
         # print(endpoint_response.text)
 
