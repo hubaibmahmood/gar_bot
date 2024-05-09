@@ -254,7 +254,22 @@ async def main(data):
 
                         try:
 
-                            if "25" in item['voucher_data'][i]['voucher_value']:
+
+
+                            if "2530" in item['voucher_data'][i]['voucher_value']:
+                                print("2530 found!!")
+
+                                diamonds_div2 = await page.find("2530 diamond")
+
+                                if diamonds_div2:
+                                    await diamonds_div2.click()
+                                    time.sleep(1)
+                                
+                                else:
+                                    print("Diamond with required quantity not found!!")
+
+
+                            elif "25" in item['voucher_data'][i]['voucher_value']:
                                 print("25 found!!")
 
                                 diamonds_div = await page.find("25 diamond")
@@ -295,6 +310,18 @@ async def main(data):
                                     print("Diamond with required quantity not found!!")
 
 
+                            elif "1240" in item['voucher_data'][i]['voucher_value']:
+                                print("1240 found!!")
+
+                                diamonds_div2 = await page.find("1240 diamond")
+
+                                if diamonds_div2:
+                                    await diamonds_div2.click()
+                                    time.sleep(1)
+                                
+                                else:
+                                    print("Diamond with required quantity not found!!")
+
 
 
                             elif "240" in item['voucher_data'][i]['voucher_value']:
@@ -323,38 +350,6 @@ async def main(data):
                                 
                                 else:
                                     print("Diamond with required quantity not found!!")
-
-
-
-
-                            elif "1240" in item['voucher_data'][i]['voucher_value']:
-                                print("240 found!!")
-
-                                diamonds_div2 = await page.find("240 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-
-
-
-                            elif "2530" in item['voucher_data'][i]['voucher_value']:
-                                print("2530 found!!")
-
-                                diamonds_div2 = await page.find("2530 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
 
 
 
