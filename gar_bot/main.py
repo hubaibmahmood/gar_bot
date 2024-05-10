@@ -78,6 +78,8 @@ async def generator():
 
 async def rate_limit_checker(page):
 
+    repeat: bool = False
+
     while True:
         try:
             rate_limit = await page.find("You are being rate limited", timeout=2)
@@ -88,11 +90,16 @@ async def rate_limit_checker(page):
 
                 await page.reload()
 
+            repeat = True
+
         except Exception as e:
             break
 
 
-    return
+    return  repeat
+
+
+
 
 async def main(data):
     global main_tab
@@ -117,7 +124,7 @@ async def main(data):
         
     }
 
-    response_endpoint: str = "https://gameheaven.net/wp-json/custom-order-plugin/v1/orders"
+    response_endpoint: str = f"{data['domain']}/wp-json/custom-order-plugin/v1/orders"
 
     
 
@@ -138,8 +145,8 @@ async def main(data):
         return response_dict
         
 
-    # with open(os.path.join(os.getcwd(),"trxids.txt"), "a") as f:
-    #     f.write(data['trxid']+"\n")
+    with open(os.path.join(os.getcwd(),"trxids.txt"), "a") as f:
+        f.write(data['trxid']+"\n")
 
     while True:
 
@@ -268,155 +275,165 @@ async def main(data):
 
                         try:
 
+                            while True:
+
+                                if "2530" in item['voucher_data'][i]['voucher_value']:
+                                    print("2530 found!!")
+
+                                    diamonds_div2 = await page.find("2530 diamond")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
 
 
-                            if "2530" in item['voucher_data'][i]['voucher_value']:
-                                print("2530 found!!")
+                                elif "25" in item['voucher_data'][i]['voucher_value']:
+                                    print("25 found!!")
 
-                                diamonds_div2 = await page.find("2530 diamond")
+                                    diamonds_div = await page.find("25 diamond")
 
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
+                                    if diamonds_div:
+                                        await diamonds_div.click()
+                                        time.sleep(1)
+
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+                                elif "50" in item['voucher_data'][i]['voucher_value']:
+                                    print("50 found!!")
+
+                                    diamonds_div2 = await page.find("50 diamond")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
                                 
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-                            elif "25" in item['voucher_data'][i]['voucher_value']:
-                                print("25 found!!")
-
-                                diamonds_div = await page.find("25 diamond")
-
-                                if diamonds_div:
-                                    await diamonds_div.click()
-                                    time.sleep(1)
-
                                 
+                                elif "115" in item['voucher_data'][i]['voucher_value']:
+                                    print("115 found!!")
+
+                                    diamonds_div2 = await page.find("115 diamond")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+                                elif "1240" in item['voucher_data'][i]['voucher_value']:
+                                    print("1240 found!!")
+
+                                    diamonds_div2 = await page.find("1240 diamond")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+
+                                elif "240" in item['voucher_data'][i]['voucher_value']:
+                                    print("240 found!!")
+
+                                    diamonds_div2 = await page.find("240 diamond")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+
+
+                                elif "610" in item['voucher_data'][i]['voucher_value']:
+                                    print("610 found!!")
+
+                                    diamonds_div2 = await page.find("610 diamond")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+
+
+                                elif "weekly" in item['voucher_data'][i]['voucher_value'].lower():
+
+                                    print("weekly found!!")
+
+
+                                    diamonds_div2 = await page.find("Weekly Membership")
+                                    # await diamonds_div2.highlight_overlay()
+
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        # print("weekly clicked !!!")
+
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+
+
+
+                                elif "monthly" in item['voucher_data'][i]['voucher_value'].lower():
+
+                                    print("monthly found!!")
+
+                                    diamonds_div2 = await page.find("Monthly Membership")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+
+                                elif "level up pass" in item['voucher_data'][i]['voucher_value'].lower():
+
+                                    print("level up pass found!!")
+
+                                    diamonds_div2 = await page.find("Level Up Pass")
+
+                                    if diamonds_div2:
+                                        await diamonds_div2.click()
+                                        time.sleep(1)
+                                    
+                                    else:
+                                        print("Diamond with required quantity not found!!")
+
+
+                                repeat_ = await rate_limit_checker(page)
+
+                                if repeat_:
+                                    continue
+
                                 else:
-                                    print("Diamond with required quantity not found!!")
+                                    break
 
-
-                            elif "50" in item['voucher_data'][i]['voucher_value']:
-                                print("50 found!!")
-
-                                diamonds_div2 = await page.find("50 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-                            
-                            
-                            elif "115" in item['voucher_data'][i]['voucher_value']:
-                                print("115 found!!")
-
-                                diamonds_div2 = await page.find("115 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-                            elif "1240" in item['voucher_data'][i]['voucher_value']:
-                                print("1240 found!!")
-
-                                diamonds_div2 = await page.find("1240 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-
-                            elif "240" in item['voucher_data'][i]['voucher_value']:
-                                print("240 found!!")
-
-                                diamonds_div2 = await page.find("240 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-
-
-                            elif "610" in item['voucher_data'][i]['voucher_value']:
-                                print("610 found!!")
-
-                                diamonds_div2 = await page.find("610 diamond")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-
-
-                            elif "weekly" in item['voucher_data'][i]['voucher_value'].lower():
-
-                                print("weekly found!!")
-
-
-                                diamonds_div2 = await page.find("Weekly Membership")
-                                # await diamonds_div2.highlight_overlay()
-
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    # print("weekly clicked !!!")
-
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-
-
-
-                            elif "monthly" in item['voucher_data'][i]['voucher_value'].lower():
-
-                                print("monthly found!!")
-
-                                diamonds_div2 = await page.find("Monthly Membership")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
-
-
-
-                            elif "level up pass" in item['voucher_data'][i]['voucher_value'].lower():
-
-                                print("level up pass found!!")
-
-                                diamonds_div2 = await page.find("Level Up Pass")
-
-                                if diamonds_div2:
-                                    await diamonds_div2.click()
-                                    time.sleep(1)
-                                
-                                else:
-                                    print("Diamond with required quantity not found!!")
 
 
                         except IndexError as e:
@@ -450,7 +467,6 @@ async def main(data):
                             
                             continue
 
-                        await rate_limit_checker(page)
 
                         try:
                             await page.sleep(random.uniform(2, 5))
@@ -465,40 +481,46 @@ async def main(data):
                             print("Payment selection channel not found")
 
 
-                        await rate_limit_checker(page)
 
                         voucher = item['voucher_data'][i]['voucher_codes'][j]
 
+                        while True:
 
-                        if "UPBD" in voucher:
+                            if "UPBD" in voucher:
 
-                            try:
-                                voucher_platform = await page.find("UP Gift Card")
+                                try:
+                                    voucher_platform = await page.find("UP Gift Card")
 
-                                if voucher_platform:
-                                    await voucher_platform.click()
-                                    time.sleep(1)
+                                    if voucher_platform:
+                                        await voucher_platform.click()
+                                        time.sleep(1)
 
-                            
-                            except Exception as e:
-                                print("Voucher platform not found!!!")
+                                
+                                except Exception as e:
+                                    print("Voucher platform not found!!!")
 
 
-                        elif "BDMB" in voucher:
+                            elif "BDMB" in voucher:
 
-                            try:
-                                voucher_platform2 = await page.find("UniPin Voucher")
+                                try:
+                                    voucher_platform2 = await page.find("UniPin Voucher")
 
-                                if voucher_platform2:
-                                    await voucher_platform2.click()
-                                    time.sleep(1)
+                                    if voucher_platform2:
+                                        await voucher_platform2.click()
+                                        time.sleep(1)
 
-                            
-                            except Exception as e:
-                                print("Voucher platform not found!!!")
-                        
+                                
+                                except Exception as e:
+                                    print("Voucher platform not found!!!")
 
-                        await rate_limit_checker(page)
+
+                            repeat_ = await rate_limit_checker(page)
+
+                            if repeat_:
+                                continue
+
+                            else:
+                                break
 
 
                         pin__ = item['voucher_data'][i]['voucher_codes'][j].split(" ")[1]
@@ -510,51 +532,58 @@ async def main(data):
                         serial_ = item['voucher_data'][i]['voucher_codes'][j].split(" ")[0]
 
 
+                        while True:
 
-                        try:
-                            await page.sleep(random.uniform(2, 5))
-                            serial_input = await page.find("input[name=serial_1]")
+                            try:
+                                await page.sleep(random.uniform(2, 5))
+                                serial_input = await page.find("input[name=serial_1]")
 
-                            if serial_input:
-                                await serial_input.send_keys(serial_[0])
-                                time.sleep(1)
+                                if serial_input:
+                                    await serial_input.send_keys(serial_[0])
+                                    time.sleep(1)
 
-                            serial_input2 = await page.find("input[name=serial_2]")
-                            if serial_input2:
-                                await serial_input2.send_keys(serial_[2:])
+                                serial_input2 = await page.find("input[name=serial_2]")
+                                if serial_input2:
+                                    await serial_input2.send_keys(serial_[2:])
 
-                        except:
-                            print("serial number entry not found")
-
-
-
-                        try:
-
-                            for k in range(len(pin_)):
-                                pin_input = await page.find(f"input[name=pin_{k+1}]")
-
-                                if pin_input:
-                                    await pin_input.send_keys(pin_[k])
-
-                            time.sleep(3)
-
-                        except Exception as e:
-                            print("Failed to access pin input field!!!")
+                            except:
+                                print("serial number entry not found")
 
 
 
-                        try:
-                            confirm_btn = await page.find("confirm")
+                            try:
 
-                            if confirm_btn:
-                                await confirm_btn.click()
-                                time.sleep(1)
-                            
-                        except Exception as e:
-                            pass
+                                for k in range(len(pin_)):
+                                    pin_input = await page.find(f"input[name=pin_{k+1}]")
+
+                                    if pin_input:
+                                        await pin_input.send_keys(pin_[k])
+
+                                time.sleep(3)
+
+                            except Exception as e:
+                                print("Failed to access pin input field!!!")
 
 
-                        await rate_limit_checker(page)
+
+                            try:
+                                confirm_btn = await page.find("confirm")
+
+                                if confirm_btn:
+                                    await confirm_btn.click()
+                                    time.sleep(1)
+                                
+                            except Exception as e:
+                                pass
+
+
+                            repeat_ = await rate_limit_checker(page)
+
+                            if repeat_:
+                                continue
+
+                            else:
+                                break
 
 
 
