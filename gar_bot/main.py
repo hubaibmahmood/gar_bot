@@ -26,11 +26,6 @@ PASSWORD = config('PASSWORD')
 
 
 
-# PROXY = "gw.dataimpulse.com:823"
-# USERNAME = "cc72c1209265887c7f62"
-# PASSWORD = "5a62f7c1961e3096"
-
-
 main_tab: uc.Tab
 
 
@@ -68,20 +63,36 @@ async def req_paused(event: uc.cdp.fetch.RequestPaused):
 
 async def generator():
     browser = await uc.start(
-        browser_args=[f"--proxy-server={PROXY}"],
+        # browser_args=[f"--proxy-server={PROXY}"],
     )
-    main_tab = await browser.get("draft:,")
-    main_tab.add_handler(uc.cdp.fetch.RequestPaused, req_paused)
-    main_tab.add_handler(
-        uc.cdp.fetch.AuthRequired, auth_challenge_handler
-    )
-    await main_tab.send(uc.cdp.fetch.enable(handle_auth_requests=True))
+    # main_tab = await browser.get("draft:,")
+    # main_tab.add_handler(uc.cdp.fetch.RequestPaused, req_paused)
+    # main_tab.add_handler(
+    #     uc.cdp.fetch.AuthRequired, auth_challenge_handler
+    # )
+    # await main_tab.send(uc.cdp.fetch.enable(handle_auth_requests=True))
     # return await asyncio.gather(*browser, return_exceptions=True)
 
     return browser
 
 
+async def rate_limit_checker(page):
 
+    while True:
+        try:
+            rate_limit = await page.find("You are being rate limited", timeout=2)
+
+            if rate_limit:
+                print("\nSLEEPING 30 SECONDS\n")
+                await page.sleep(30)
+
+                await page.reload()
+
+        except Exception as e:
+            break
+
+
+    return
 
 async def main(data):
     global main_tab
@@ -134,20 +145,21 @@ async def main(data):
 
         try:
             browser = await uc.start(
-                browser_args=[f"--proxy-server={PROXY}"],
+                # browser_args=[f"--proxy-server={PROXY}"],
             )
-            main_tab = await browser.get("draft:,")
-            main_tab.add_handler(uc.cdp.fetch.RequestPaused, req_paused)
-            main_tab.add_handler(
-                uc.cdp.fetch.AuthRequired, auth_challenge_handler
-            )
-            await main_tab.send(uc.cdp.fetch.enable(handle_auth_requests=True))
+            # main_tab = await browser.get("draft:,")
+            # main_tab.add_handler(uc.cdp.fetch.RequestPaused, req_paused)
+            # main_tab.add_handler(
+            #     uc.cdp.fetch.AuthRequired, auth_challenge_handler
+            # )
+            # await main_tab.send(uc.cdp.fetch.enable(handle_auth_requests=True))
 
             break
             
 
         except Exception as e:
             print("Exception caught")
+            print(e)
 
 
 
@@ -178,6 +190,8 @@ async def main(data):
                     await player_id_input.send_keys(str(order_item['player_id']))
                     await page.sleep(random.uniform(2, 5))
                     # time.sleep(2)
+
+                    
                 
             except Exception as e:
                 print("Player input not found\n\nTry again later !!!\n\n")
@@ -436,6 +450,7 @@ async def main(data):
                             
                             continue
 
+                        await rate_limit_checker(page)
 
                         try:
                             await page.sleep(random.uniform(2, 5))
@@ -449,6 +464,8 @@ async def main(data):
                         except Exception as e:
                             print("Payment selection channel not found")
 
+
+                        await rate_limit_checker(page)
 
                         voucher = item['voucher_data'][i]['voucher_codes'][j]
 
@@ -480,6 +497,8 @@ async def main(data):
                             except Exception as e:
                                 print("Voucher platform not found!!!")
                         
+
+                        await rate_limit_checker(page)
 
 
                         pin__ = item['voucher_data'][i]['voucher_codes'][j].split(" ")[1]
@@ -534,6 +553,8 @@ async def main(data):
                         except Exception as e:
                             pass
 
+
+                        await rate_limit_checker(page)
 
 
 
@@ -881,4 +902,4 @@ if __name__ == '__main__':
 }
 
     # since asyncio.run never worked (for me)
-    # uc.loop().run_until_complete(main(payload))
+    uc.loop().run_until_complete(main(payload))
